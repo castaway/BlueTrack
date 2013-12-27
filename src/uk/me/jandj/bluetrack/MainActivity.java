@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.view.View.OnClickListener;
 import android.view.*;
 import android.bluetooth.*;
+import android.widget.*;
+import uk.me.jandj.bluetrack.*;
 
 public class MainActivity extends Activity
 {
@@ -29,7 +31,7 @@ public class MainActivity extends Activity
 		
 		ListView scanView = (ListView)findViewById(R.id.scan_list);
 		scanView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        blueArray = new ArrayAdapter(scanView, android.R.layout.simple_list_item_multiple_choice);
+        blueArray = new ArrayAdapter(this, android.R.layout.simple_list_item_multiple_choice);
         scanView.setAdapter(blueArray);
 
     }
@@ -47,9 +49,9 @@ public class MainActivity extends Activity
         adapter.startDiscovery();
 
 
-        BluetrackBroadcastReciever receiver = new BluetrackBroadcastReceiver;
-        reciever.mainactivity = this;
-        this.registerReceiver(reciver, receiver.my_filter());
+        BluetrackBroadcastReceiver receiver = new BluetrackBroadcastReceiver();
+        receiver.mainactivity = this;
+        this.registerReceiver(receiver, receiver.my_filter());
         
 	}
 	
@@ -57,7 +59,7 @@ public class MainActivity extends Activity
         blueArray.add(name);
     }
 
-    public void changeName(BleutoothDevice device, String name) {
+    public void changeName(BluetoothDevice device, String name) {
         // noop for now.
     }
 }

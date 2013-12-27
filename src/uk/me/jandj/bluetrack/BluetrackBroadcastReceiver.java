@@ -1,6 +1,12 @@
 package uk.me.jandj.bluetrack;
 // http://developer.android.com/guide/topics/connectivity/bluetooth.html#FindingDevices
+import android.content.*;
+import android.bluetooth.*;
+import android.util.Log;
+
 public class BluetrackBroadcastReceiver extends BroadcastReceiver {
+    private static final String debug_tag = "bluetrack";
+
     public MainActivity mainactivity;
     
     public IntentFilter my_filter() {
@@ -13,21 +19,21 @@ public class BluetrackBroadcastReceiver extends BroadcastReceiver {
         return filter;
     }
 
-    @override
+    @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
-        if (action.equals(BluetothDevice.ACTION_FOUND)) {
+        if (action.equals(BluetoothDevice.ACTION_FOUND)) {
             onReceiveFound(context, intent);
         } else if (action.equals(BluetoothDevice.ACTION_NAME_CHANGED)) {
             onReceiveNameChanged(context, intent);
         } else {
             // this should only happen if somebody is deliberately screwing with us (or we forgot to add a case to this if when we modified my_filter.
-            throw new Exception("Unknown action "+action+" in onReceive");
+            Log.w(debug_tag, "Unknown action "+action+" in onReceive");
         }
     }
 
-    void onReceiveFound(context, intent) {
+    void onReceiveFound(Context context, Intent intent) {
         // Always contains the extra fields EXTRA_DEVICE and EXTRA_CLASS. Can contain the extra fields EXTRA_NAME and/or EXTRA_RSSI if they are available.
         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         String rssi = intent.getStringExtra(BluetoothDevice.EXTRA_RSSI);
@@ -38,7 +44,7 @@ public class BluetrackBroadcastReceiver extends BroadcastReceiver {
         mainactivity.addDetected(device, rssi, name);
     }
 
-    void onReceiveNameChanged(context, intent) {
+    void onReceiveNameChanged(Context context, Intent intent) {
         // Always contains the extra fields EXTRA_DEVICE and EXTRA_NAME.
         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
