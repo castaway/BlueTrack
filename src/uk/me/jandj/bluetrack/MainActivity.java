@@ -2,8 +2,10 @@ package uk.me.jandj.bluetrack;
 
 import android.app.*;
 import android.os.*;
+import android.widget.ListView;
+import android.widget.Button;
+import android.view.View.OnClickListener;
 import android.view.*;
-import android.widget.*;
 
 public class MainActivity extends Activity
 {
@@ -13,5 +15,28 @@ public class MainActivity extends Activity
 	{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+		
+		Button scanButton = (Button)findViewById(R.id.scan_button);
+		scanButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View view) {
+				startScan();
+			}
+		});
+		
+		ListView scanView = (ListView)findViewById(R.id.scan_list);
+		scanView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		
     }
+
+	@Override
+	protected void onStart()
+	{
+		// TODO: Implement this method
+		super.onStart();
+	}
+	
+	protected void startScan() {
+		
+	}
+	
 }

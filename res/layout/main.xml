@@ -5,9 +5,13 @@
     android:gravity="center"
     android:orientation="vertical" >
 
-    <TextView
+    <Button
+		android:id="@+id/scan_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello" />
+        android:text="@string/scan_btn"/>
+	<ListView
+		android:id="@+id/scan_list"
+		/>
 
 </LinearLayout>
