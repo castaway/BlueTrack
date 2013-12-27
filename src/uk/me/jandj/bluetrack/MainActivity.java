@@ -27,13 +27,6 @@ public class MainActivity extends Activity
 		scanView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		
     }
-
-	@Override
-	protected void onStart()
-	{
-		// TODO: Implement this method
-		super.onStart();
-	}
 	
 	protected void startScan() {
 		
