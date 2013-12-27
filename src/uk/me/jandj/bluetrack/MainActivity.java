@@ -33,13 +33,6 @@ public class MainActivity extends Activity
         scanView.setAdapter(blueArray);
 
     }
-
-	@Override
-	protected void onStart()
-	{
-		// TODO: Implement this method
-		super.onStart();
-	}
 	
 	protected void startScan() {
         // FIXME: This stuff should probably be moved out to the service?
