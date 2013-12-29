@@ -1,0 +1,5 @@
+See https://trello.com/b/HtPKMUWY/bluetrack
+
+* https://github.com/commonsguy/cwac-loaderex SQLiteCursorLoader?
+* http://www.androiddesignpatterns.com/2012/09/tutorial-loader-loadermanager.html
+* http://www.vogella.com/articles/AndroidSQLite/article.html#contentprovider
