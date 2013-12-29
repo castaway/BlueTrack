@@ -17,7 +17,14 @@ public class DeviceDatabaseContentProvider extends ContentProvider {
         SQLiteDatabase db;
         db = dbHelper.getReadableDatabase();
 
-        return db.rawQuery("SELECT _id, name FROM bluetooth_devices ORDER BY mac", null);
+        Log.d(debug_tag, "ContentProvider.query: Selecting all _id, name from bluetooth_devices for uri " + uri);
+
+        // Make sure this cursor knows when it gets updated !?
+        // http://stackoverflow.com/questions/7915050/cursorloader-not-updating-after-data-change
+        Cursor cursor = db.rawQuery("SELECT _id, name FROM bluetooth_devices ORDER BY mac", null);
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+        return cursor;
     }
 
     public Uri insert(Uri uri, ContentValues values) {

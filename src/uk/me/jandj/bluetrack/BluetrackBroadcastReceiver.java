@@ -69,7 +69,8 @@ public class BluetrackBroadcastReceiver extends BroadcastReceiver {
         Log.d(debug_tag, "BroadcastReceiver.onReceiveFound: Update db: ContentValues="+cv);
         long rowid = blueDB.insertWithOnConflict("bluetooth_devices", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
 
-        context.getContentResolver().notifyChange(Uri.parse("content://uk.me.jandj.bluetrack.db_provider/luetooth_devices"), null);
+        Log.d(debug_tag, "BroadcastReceiver.onReceiveFound: Notify content resolver");
+        context.getContentResolver().notifyChange(Uri.parse("content://uk.me.jandj.bluetrack.db_provider/bluetooth_devices"), null);
 
         // mainactivity.addDetected(device, rssi, name);
     }
