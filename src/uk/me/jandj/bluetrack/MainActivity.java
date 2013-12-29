@@ -9,11 +9,13 @@ import android.view.*;
 import android.bluetooth.*;
 import android.widget.*;
 import uk.me.jandj.bluetrack.*;
+import android.database.*;
 
 public class MainActivity extends Activity
 {
     BluetoothAdapter adapter;
-    ArrayAdapter<String> blueArray; 
+    DeviceDatabase blueDBHelper;
+    LoaderManager.LoaderCallbacks<Cursor> dbCallbacks;
 
     /** Called when the activity is first created. */
     @Override
@@ -31,9 +33,30 @@ public class MainActivity extends Activity
 		
 		ListView scanView = (ListView)findViewById(R.id.scan_list);
 		scanView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        blueArray = new ArrayAdapter(this, android.R.layout.simple_list_item_multiple_choice);
-        scanView.setAdapter(blueArray);
 
+        blueDBHelper = new DeviceDatabase(this);
+        //        Cursor scanViewCursor = blueDBHelper.getReadableDatabase()
+        //            .rawQuery("SELECT _id, name FROM bluetooth_devices ORDER BY mac", null);
+        SimpleCursorAdapter scanAdapter = new SimpleCursorAdapter(this,
+                                                    android.R.layout.simple_list_item_multiple_choice,
+                                                    // scanViewCursor,
+                                                    null,
+                                                    new String [] { "name" },
+                                                    new int [] { android.R.id.text1 },
+                                                    0
+                                                                  );
+
+        scanView.setAdapter(scanAdapter);
+                                                    
+
+        dbCallbacks = new DeviceDatabaseCallbacks(this, scanAdapter);
+        LoaderManager lm = getLoaderManager();
+        lm.initLoader(R.id.device_db_loader, null, dbCallbacks);
+
+    }
+    
+    public void onStart() {
+        super.onStart();
     }
 	
 	protected void startScan() {
@@ -49,17 +72,19 @@ public class MainActivity extends Activity
         adapter.startDiscovery();
 
 
-        BluetrackBroadcastReceiver receiver = new BluetrackBroadcastReceiver();
-        receiver.mainactivity = this;
+        BluetrackBroadcastReceiver receiver = new BluetrackBroadcastReceiver(this, blueDBHelper.getWritableDatabase());
         this.registerReceiver(receiver, receiver.my_filter());
-        
 	}
+
+    //public void updateScanView() {
+	//	ListView scanView = (ListView)findViewById(R.id.scan_list);
+    //}
 	
     public void addDetected(BluetoothDevice device, String rssi, String name) {
-        blueArray.add(name);
+        //blueArray.add("name: "+name+", addr: "+device.getAddress()+", rssi: ", rssi);
     }
 
     public void changeName(BluetoothDevice device, String name) {
-        // noop for now.
+        //blueArray.add("fixme, changename, name: "+name+", addr: "+device.getAddress());
     }
 }
