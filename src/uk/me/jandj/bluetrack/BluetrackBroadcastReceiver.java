@@ -31,9 +31,12 @@ public class BluetrackBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
+        Log.d(debug_tag, "BroadcastReceiver.onReceive: intent="+intent);
         if (action.equals(BluetoothDevice.ACTION_FOUND)) {
+            Log.d(debug_tag, "BroadcastReceiver.onReceive: action_found");
             onReceiveFound(context, intent);
         } else if (action.equals(BluetoothDevice.ACTION_NAME_CHANGED)) {
+        Log.d(debug_tag, "BroadcastReceiver.onReceive: name_changed");
             onReceiveNameChanged(context, intent);
         } else {
             // this should only happen if somebody is deliberately screwing with us (or we forgot to add a case to this if when we modified my_filter.
@@ -63,6 +66,7 @@ public class BluetrackBroadcastReceiver extends BroadcastReceiver {
         // If we've already heard of this device (same mac string), just
         // ignore (will return the ID of the row we've already seen)
         // FIXME: conflict resolution should update rssi, last_seen.
+        Log.d(debug_tag, "BroadcastReceiver.onReceiveFound: Update db: ContentValues="+cv);
         long rowid = blueDB.insertWithOnConflict("bluetooth_devices", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
 
         context.getContentResolver().notifyChange(Uri.parse("content://uk.me.jandj.bluetrack.db_provider/luetooth_devices"), null);
