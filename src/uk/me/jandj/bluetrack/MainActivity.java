@@ -10,12 +10,18 @@ import android.bluetooth.*;
 import android.widget.*;
 import uk.me.jandj.bluetrack.*;
 import android.database.*;
+import android.content.*;
+import android.util.Log;
 
 public class MainActivity extends Activity
 {
+    private static final String debug_tag = "bluetrack";
     BluetoothAdapter adapter;
     DeviceDatabase blueDBHelper;
     LoaderManager.LoaderCallbacks<Cursor> dbCallbacks;
+
+    // activityforresult request codes:
+    int REQUEST_ENABLE_BT = 100;
 
     /** Called when the activity is first created. */
     @Override
@@ -35,11 +41,8 @@ public class MainActivity extends Activity
 		scanView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         blueDBHelper = new DeviceDatabase(this);
-        //        Cursor scanViewCursor = blueDBHelper.getReadableDatabase()
-        //            .rawQuery("SELECT _id, name FROM bluetooth_devices ORDER BY mac", null);
         SimpleCursorAdapter scanAdapter = new SimpleCursorAdapter(this,
                                                     android.R.layout.simple_list_item_multiple_choice,
-                                                    // scanViewCursor,
                                                     null,
                                                     new String [] { "name" },
                                                     new int [] { android.R.id.text1 },
@@ -47,7 +50,6 @@ public class MainActivity extends Activity
                                                                   );
 
         scanView.setAdapter(scanAdapter);
-                                                    
 
         dbCallbacks = new DeviceDatabaseCallbacks(this, scanAdapter);
         LoaderManager lm = getLoaderManager();
@@ -58,23 +60,48 @@ public class MainActivity extends Activity
     public void onStart() {
         super.onStart();
     }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_ENABLE_BT) {
+            Log.d(debug_tag, "MainActivity:onActivityResult: Got result of asking to turn on bluetooth");
+            // Assuming said adapter is still here:
+            actualStartScan();
+        } else {
+            Log.d(debug_tag, "MainActivity:onActivityResult: Some activity result we weren't expecting happened! requestCode="+requestCode);
+        }
+    }
 	
 	protected void startScan() {
         // FIXME: This stuff should probably be moved out to the service?
         // FIXME: Can return null if bluetooth not supported by hw (but manafest should keep us from being installed on such hw).
         adapter = BluetoothAdapter.getDefaultAdapter();
         
-        if (!adapter.isEnabled()) {
-            // FIXME: Ask user to enable bluetooth.
+        if(adapter == null) {
+            Log.d(debug_tag, "MainActivity.startScan: This device doesn't support bluetooth!");
         }
-        
+
+        if (!adapter.isEnabled()) {
+            Log.d(debug_tag, "MainActivity: startScan: Bluetooth not enabled, asking user to fix that");
+            Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
+            return;
+        }
+
+        actualStartScan();
+	}
+
+    protected void actualStartScan() {
+        if(adapter == null) {
+            Log.d(debug_tag, "MainActivity:actualStartScan: Someone tried to start an actual scan before setting up the Bluetooth adapter, silly developer");
+            return;
+        }
+
         // Can return null if not on, but that should have been handled by isEnabled.
         adapter.startDiscovery();
 
-
         BluetrackBroadcastReceiver receiver = new BluetrackBroadcastReceiver(this, blueDBHelper.getWritableDatabase());
         this.registerReceiver(receiver, receiver.my_filter());
-	}
+    }
 
     //public void updateScanView() {
 	//	ListView scanView = (ListView)findViewById(R.id.scan_list);
